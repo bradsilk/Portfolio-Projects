@@ -138,7 +138,7 @@ ALTER TABLE housing ADD (PropertySplitStreet VARCHAR(255));
 UPDATE housing SET PropertySplitStreet =
 	SUBSTRING(PropertyAddress, 1 , LOCATE(',', PropertyAddress) -1);
 
-ALTER TABLE housing ADD (PropertySplitCity NVARCHAR(255));
+ALTER TABLE housing ADD (PropertySplitCity VARCHAR(255));
 UPDATE housing SET PropertySplitCity =
 	SUBSTRING(PropertyAddress, LOCATE(',', PropertyAddress) +1);
 
