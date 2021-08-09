@@ -272,7 +272,7 @@ SELECT * FROM v_incidents WHERE case_number IS NULL OR case_number = '';
 SELECT * FROM v_incidents WHERE treatment_date IS NULL OR treatment_date = '';
 SELECT * FROM v_incidents WHERE age_altered IS NULL OR age_altered = '';
 	-- 28 rows with missing age detected (0.000095 % of all rows) - replace with mean or median age values depending on distribution shape
-	-- Distribution visualized in Python; see NEISSAgeDistCheck.ipynb
+	-- Distribution visualized in Python; see NEISS - age distribition check.ipynb
 SELECT * FROM v_incidents WHERE race IS NULL OR race = '';
 SELECT * FROM v_incidents WHERE body_part IS NULL OR body_part = '';
 SELECT * FROM v_incidents WHERE diagnosis IS NULL OR diagnosis = '';
