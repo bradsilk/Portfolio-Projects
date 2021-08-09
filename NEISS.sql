@@ -4,9 +4,9 @@ SET SQL_SAFE_UPDATES = 0;
 -- 1.) Create table for 2020 NEISS Data Highlights:
 
 CREATE TABLE highlights (
-	product_group VARCHAR(255), 
+    product_group VARCHAR(255), 
     est_injuries INTEGER,
-	all_ages INTEGER, 
+    all_ages INTEGER, 
     `0-4` INTEGER, 
     `5-14` INTEGER, 
     `15-24` INTEGER,
@@ -24,7 +24,7 @@ CREATE TABLE highlights (
 -- 2.) Create table for 2020 NEISS Incident Data:
 
 CREATE TABLE incidents (
-	case_number SERIAL PRIMARY KEY, 
+    case_number SERIAL PRIMARY KEY, 
     treatment_date VARCHAR(255),
     age INTEGER,
     sex INTEGER, 
@@ -70,7 +70,7 @@ CREATE TABLE incidents2 AS
 SELECT 
 	i1.*,
 	CASE 
-		WHEN LENGTH(i1.age) = 3 AND LEFT(i1.age, 1) = 2 THEN (SELECT ROUND((RIGHT(i1.age, 2)/12),2) FROM incidents WHERE LENGTH(i1.age) = 3 AND LEFT(i1.age, 1) = 2 LIMIT 1)
+	    WHEN LENGTH(i1.age) = 3 AND LEFT(i1.age, 1) = 2 THEN (SELECT ROUND((RIGHT(i1.age, 2)/12),2) FROM incidents WHERE LENGTH(i1.age) = 3 AND LEFT(i1.age, 1) = 2 LIMIT 1)
         ELSE i1.age 
 END AS age_altered
 FROM incidents i1
@@ -97,10 +97,10 @@ MODIFY sex VARCHAR(255);
 UPDATE incidents 
 SET sex =
     CASE 
-		WHEN sex = 1 THEN 'M'
+	WHEN sex = 1 THEN 'M'
         WHEN sex = 2 THEN 'F'
         ELSE 'NR' 
-	END;
+    END;
 
 
 /* d.) Race - Substitute 'White' for 1, 'Black' for 2, 'Other' for 3, 'Asian' for 4, 'AI/AN' (American Indian/Alaska Native) for 5, 
@@ -112,14 +112,14 @@ MODIFY race VARCHAR(255);
 UPDATE incidents 
 SET race =
     CASE 
-		WHEN race = 1 THEN 'White'
+	WHEN race = 1 THEN 'White'
         WHEN race = 2 THEN 'Black'
         WHEN race = 3 THEN 'Other'
         WHEN race = 4 THEN 'Asian'
         WHEN race = 5 THEN 'AI/AN'
         WHEN race = 6 THEN 'NH/PI'
         WHEN race = 0 THEN 'NS' 
-	END;
+    END;
 
 
 
@@ -133,7 +133,7 @@ CREATE TABLE body_parts (
     -- Data inserted from CSV using Table Data Import Wizard; no errors
 
 SELECT 
-	case_number,
+    case_number,
     age,
     body_part,
     body_part_affected
@@ -151,7 +151,7 @@ CREATE TABLE diagnoses (
     -- Data inserted from CSV using Table Data Import Wizard; no errors
 
 SELECT 
-	case_number,
+    case_number,
     age,
     incidents.diagnosis,
     diagnoses.diagnosis
@@ -169,13 +169,13 @@ MODIFY disposition VARCHAR(255);
 UPDATE incidents 
 SET disposition =
     CASE 
-		WHEN disposition = 1 THEN 'Treated or examined and released'
+	WHEN disposition = 1 THEN 'Treated or examined and released'
         WHEN disposition = 2 THEN 'Treated and transferred'
         WHEN disposition = 4 THEN 'Treated and admitted for hospitalization'
         WHEN disposition = 5 THEN 'Held for observation'
         WHEN disposition = 6 THEN 'Left without being seen/against advice'
         WHEN disposition = 8 THEN 'Fatality or DOA' 
-		WHEN disposition = 9 THEN 'NR'
+	WHEN disposition = 9 THEN 'NR'
 	END;
 
 
@@ -190,7 +190,7 @@ CREATE TABLE inc_location (
     # Data inserted from CSV using Table Data Import Wizard; no errors
 
 SELECT 
-	case_number,
+    case_number,
     age,
     inj_location.location,
     incidents.location
@@ -208,23 +208,23 @@ MODIFY fire_involvement VARCHAR(255);
 UPDATE incidents 
 SET fire_involvement =
     CASE 
-		WHEN fire_involvement = 0 THEN 'No fire'
+	WHEN fire_involvement = 0 THEN 'No fire'
         WHEN fire_involvement = 1 THEN 'Fire or smoke inhalation, fire dept attended'
-		WHEN fire_involvement = 2 THEN 'Fire or smoke inhalation, fire dept did not attend'
+	WHEN fire_involvement = 2 THEN 'Fire or smoke inhalation, fire dept did not attend'
         WHEN fire_involvement = 3 THEN 'Fire or smoke inhalation, fire dept attendance not recorded'
 	END;
 
 # j.)  Primary Product -- MAKE TABLE (2020 Comparability Table Pages 1 - 76):
 
 CREATE TABLE product (
-	code INTEGER PRIMARY KEY,
+    code INTEGER PRIMARY KEY,
     PRODUCT TEXT
     );
 
    # Data inserted from CSV using Table Data Import Wizard; no errors
 
 SELECT 
-	case_number,
+    case_number,
     age,
     products.product,
     incidents.product_1
@@ -240,7 +240,7 @@ WHERE RIGHT(product,1) = ' ';
 
 CREATE VIEW v_incidents AS
 SELECT 
-	case_number,
+    case_number,
     treatment_date,
     age_altered,
     sex,
@@ -306,7 +306,7 @@ WHERE age_altered IS NULL;
 # a.) Top 10 most common products listed:
 
 SELECT 
-	product,
+    product,
     COUNT(product)
 FROM v_incidents
 GROUP BY product
@@ -317,15 +317,15 @@ LIMIT 10;
 # b.) Most common product injury by age
 
 SELECT * FROM (
-SELECT
+	SELECT
 	age_altered,
-    product,
-    COUNT(product),
-    RANK() OVER (PARTITION BY age_altered ORDER BY COUNT(product) DESC) AS age_group_rank
-FROM v_incidents
-GROUP BY age_altered, product
-ORDER BY age_altered, COUNT(product) DESC
-) a 
+	    product,
+	    COUNT(product),
+	    RANK() OVER (PARTITION BY age_altered ORDER BY COUNT(product) DESC) AS age_group_rank
+	FROM v_incidents
+	GROUP BY age_altered, product
+	ORDER BY age_altered, COUNT(product) DESC
+	) a 
 WHERE age_group_rank = 1;
 
 
@@ -337,7 +337,7 @@ floor-related injuries (likely falls) are the most numerous. */
 # c.) Are firework injuries more common in July than other months?
 
 SELECT 
-	MID(treatment_date, 6,2) AS month,
+    MID(treatment_date, 6,2) AS month,
     product,
     COUNT(product)
 FROM v_incidents
@@ -351,7 +351,7 @@ ORDER BY COUNT(product) DESC;
 # d.) Count of all knee injuries per month
 
 SELECT 
-	SUM(CASE WHEN MONTH(treatment_date) = 1 AND body_part_affected = 'Knee' THEN 1 ELSE 0 END) AS January,
+    SUM(CASE WHEN MONTH(treatment_date) = 1 AND body_part_affected = 'Knee' THEN 1 ELSE 0 END) AS January,
     SUM(CASE WHEN MONTH(treatment_date) = 2 AND body_part_affected = 'Knee' THEN 1 ELSE 0 END) AS February,
     SUM(CASE WHEN MONTH(treatment_date) = 3 AND body_part_affected = 'Knee' THEN 1 ELSE 0 END) AS March,
     SUM(CASE WHEN MONTH(treatment_date) = 4 AND body_part_affected = 'Knee' THEN 1 ELSE 0 END) AS April,
@@ -360,8 +360,8 @@ SELECT
     SUM(CASE WHEN MONTH(treatment_date) = 7 AND body_part_affected = 'Knee' THEN 1 ELSE 0 END) AS July,
     SUM(CASE WHEN MONTH(treatment_date) = 8 AND body_part_affected = 'Knee' THEN 1 ELSE 0 END) AS August,
     SUM(CASE WHEN MONTH(treatment_date) = 9 AND body_part_affected = 'Knee' THEN 1 ELSE 0 END) AS September,
-	SUM(CASE WHEN MONTH(treatment_date) = 10 AND body_part_affected = 'Knee' THEN 1 ELSE 0 END) AS October,
-	SUM(CASE WHEN MONTH(treatment_date) = 11 AND body_part_affected = 'Knee' THEN 1 ELSE 0 END) AS November,
+    SUM(CASE WHEN MONTH(treatment_date) = 10 AND body_part_affected = 'Knee' THEN 1 ELSE 0 END) AS October,
+    SUM(CASE WHEN MONTH(treatment_date) = 11 AND body_part_affected = 'Knee' THEN 1 ELSE 0 END) AS November,
     SUM(CASE WHEN MONTH(treatment_date) = 12 AND body_part_affected = 'Knee' THEN 1 ELSE 0 END) AS December,
     SUM(CASE WHEN body_part_affected = 'Knee' THEN 1 ELSE 0 END) AS Total
 FROM v_incidents;
@@ -371,15 +371,16 @@ FROM v_incidents;
 
 WITH injury_counts (treatment_date, injury_count) AS (
 	SELECT 
-		treatment_date,
-		COUNT(treatment_date) AS injury_count
+	    treatment_date,
+	    COUNT(treatment_date) AS injury_count
 	FROM v_incidents
 	GROUP BY treatment_date
-	ORDER BY treatment_date)
+	ORDER BY treatment_date
+	)
 SELECT 
-	treatment_date,
+    treatment_date,
     injury_count,
-	SUM(injury_count) OVER (ORDER BY treatment_date) 
+    SUM(injury_count) OVER (ORDER BY treatment_date) 
 FROM injury_counts;
 
 
@@ -388,7 +389,7 @@ split by gender: */
 
 SELECT 
 	(SELECT 
-		diagnosis 
+	    diagnosis 
 	FROM v_incidents
 	WHERE product = 'Floors or flooring materials' AND alcohol = 1 AND sex= 'M'
 	GROUP BY diagnosis
@@ -409,10 +410,10 @@ GROUP BY male, female;
 # g.) Find the number of days that elapsed between the first and third bottle opener injuries:
 
 SELECT 
-	product,
-	treatment_date,
+    product,
+    treatment_date,
     DAYOFYEAR(treatment_date),
-	LEAD(DAYOFYEAR(treatment_date),2) OVER (ORDER BY DAYOFYEAR(treatment_date)) - DAYOFYEAR(treatment_date) AS days_elapsed
+    LEAD(DAYOFYEAR(treatment_date),2) OVER (ORDER BY DAYOFYEAR(treatment_date)) - DAYOFYEAR(treatment_date) AS days_elapsed
 FROM v_incidents
 WHERE product = 'Bottle openers'
 ORDER BY treatment_date;
